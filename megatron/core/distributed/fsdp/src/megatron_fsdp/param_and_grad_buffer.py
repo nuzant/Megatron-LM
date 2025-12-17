@@ -2518,8 +2518,7 @@ class ParamAndGradBuffer:
                     #     print(f"[debug mcore] before set grad for param: {name}, param.grad.shape={param.grad.shape if param.grad is not None else None}")
                     # if grad is not None:
                     #     print(f"[debug mcore] set grad for param: {name}, grad.shape={grad.shape}")
-                    # setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
-                    setattr(param, "grad", grad.to(torch.float32) if grad is not None else None)
+                    setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
             except Exception as e:
                 raise_flag = True
                 errors.append(
