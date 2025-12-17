@@ -2514,6 +2514,11 @@ class ParamAndGradBuffer:
                     setattr(param, "decoupled_grad", grad)
                 else:
                     # Attach the gradient to the optimizer parameter.
+                    if hasattr(param, "grad"):
+                        print(f"[debug mcore] before set grad for param: {name}, param.grad.shape={param.grad.shape if param.grad is not None else None}")
+                    if grad is not None:
+                        print(f"[debug mcore] set grad for param: {name}, grad.shape={grad.shape}")
+                        
                     setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
             except Exception as e:
                 raise_flag = True
