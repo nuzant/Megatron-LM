@@ -527,6 +527,11 @@ def get_megatron_optimizer(
                 filter_fn=lambda g: True,
                 buffer_name='buffers',
             )
+            if torch.distributed.get_rank() == 0:
+                print(f"[debug mcore] type(model_chunk)={type(model_chunk)}")
+                print(f"[debug mcore] overlap_param_gather_with_optimizer_step={overlap_param_gather_with_optimizer_step}")
+                print(f"[debug mcore] param_groups={param_groups}")
+                print(f"[debug mcore] buffers={buffers}")
 
             optimizers.append(
                 _get_megatron_optimizer_based_on_param_groups(

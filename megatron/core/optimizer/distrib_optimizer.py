@@ -528,8 +528,9 @@ class DistributedOptimizer(MixedPrecisionOptimizer):
 
         # Model grad buffer ranges.
         assert per_model_buffers is not None, "per_model_buffers must be provided"
-        for k, v in per_model_buffers.items():
-            print(f"[debug mcore] key={k} type(v)={type(v)} value={v}")
+        if torch.distributed.get_rank() == 0:
+            for k, v in per_model_buffers.items():
+                print(f"[debug mcore] key={k} type(v)={type(v)} value={v}")
         self.buffers = list(itertools.chain(*per_model_buffers.values()))
         self.per_model_buffers = per_model_buffers
         self.data_parallel_group = data_parallel_group
