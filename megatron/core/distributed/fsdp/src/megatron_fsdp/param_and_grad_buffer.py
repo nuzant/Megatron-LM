@@ -2343,8 +2343,10 @@ class ParamAndGradBuffer:
 
                 # Register model training and high-precision parameters as DTensor(s).
                 if mbuf:
+                    local_tensor = mbuf.get_item(item_id, only_shard=sharded_optimizer_state)
+                    print(f"[debug mcore] register dist param from mbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
                     dist_param = make_fsdp_dtensor(
-                        local_tensor=mbuf.get_item(item_id, only_shard=sharded_optimizer_state),
+                        local_tensor=local_tensor,
                         param=orig_param,
                         dist_index=self.dist_index,
                         is_sharded_param=sharded_optimizer_state,
@@ -2355,6 +2357,8 @@ class ParamAndGradBuffer:
                     )
                     dist_main_weight[param_name] = dist_param
                 elif wbuf:
+                    local_tensor = wbuf.get_item(item_id, only_shard=sharded_optimizer_state)
+                    print(f"[debug mcore] register dist param from wbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
                     dist_param = make_fsdp_dtensor(
                         local_tensor=wbuf.get_item(item_id, only_shard=sharded_optimizer_state),
                         param=orig_param,
