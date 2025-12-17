@@ -2454,7 +2454,10 @@ class ParamAndGradBuffer:
         falls back to the original module parameters not managed by cFSDP
         in the case of no sharding / cFSDP OFF.
         """
+        raise_flag = False
+        errors = []
         for name, param in self.optimizer_named_parameters:
+            print(f"[debug mcore] update main grads for param: {name}")
             orig_param = param.orig_param
             group = self.parameter_groups[self.param_to_param_group[orig_param]]
             gbuf = group.main_grad_buffer
@@ -2498,13 +2501,22 @@ class ParamAndGradBuffer:
             if optimizer_grad.numel() == 0:
                 grad = None
 
-            # The presence of main_grad_buffer but no main_weight_buffer may imply
-            # that a precision-aware optimizer is used.
-            if getattr(self, "use_precision_aware_optimizer", False):
-                setattr(param, "decoupled_grad", grad)
-            else:
-                # Attach the gradient to the optimizer parameter.
-                setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
+            try:
+                # The presence of main_grad_buffer but no main_weight_buffer may imply
+                # that a precision-aware optimizer is used.
+                if getattr(self, "use_precision_aware_optimizer", False):
+                    setattr(param, "decoupled_grad", grad)
+                else:
+                    # Attach the gradient to the optimizer parameter.
+                    setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
+            except Exception as e:
+                raise_flag = True
+                errors.append(
+                    f"Failed to set grad for parameter {name} with shape {param.shape}: {e}"
+                )
+        
+        if raise_flag:
+            raise RuntimeError("\n".join(errors))
 
     @property
     def num_buckets(self):
