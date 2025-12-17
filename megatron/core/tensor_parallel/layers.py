@@ -551,7 +551,7 @@ class LinearWithGradAccumulationAndAsyncCommunication(torch.autograd.Function):
             # reduce scatter is scheduled before the weight gradient computation
 
         if ctx.gradient_accumulation_fusion:
-            print(f"[debug mcore] in ctx.gradient_accumulation_fusion={ctx.gradient_accumulation_fusion}")
+            # print(f"[debug mcore] in ctx.gradient_accumulation_fusion={ctx.gradient_accumulation_fusion}")
             if wgrad_compute:
                 # In case of Megatron-FSDP, need to create main grad buffers in-place
                 if hasattr(weight, "__fsdp_param__"):

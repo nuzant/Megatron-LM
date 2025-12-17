@@ -2344,8 +2344,8 @@ class ParamAndGradBuffer:
                 # Register model training and high-precision parameters as DTensor(s).
                 if mbuf:
                     local_tensor = mbuf.get_item(item_id, only_shard=sharded_optimizer_state)
-                    if torch.distributed.get_rank() == 0:
-                        print(f"[debug mcore] register dist param from mbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
+                    # if torch.distributed.get_rank() == 0:
+                    #     print(f"[debug mcore] register dist param from mbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
                     dist_param = make_fsdp_dtensor(
                         local_tensor=local_tensor,
                         param=orig_param,
@@ -2359,8 +2359,8 @@ class ParamAndGradBuffer:
                     dist_main_weight[param_name] = dist_param
                 elif wbuf:
                     local_tensor = wbuf.get_item(item_id, only_shard=sharded_optimizer_state)
-                    if torch.distributed.get_rank() == 0:
-                        print(f"[debug mcore] register dist param from wbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
+                    # if torch.distributed.get_rank() == 0:
+                    #     print(f"[debug mcore] register dist param from wbuf for param: {param_name}, local_tensor.shape={local_tensor.shape}")
                     dist_param = make_fsdp_dtensor(
                         local_tensor=wbuf.get_item(item_id, only_shard=sharded_optimizer_state),
                         param=orig_param,
@@ -2463,7 +2463,7 @@ class ParamAndGradBuffer:
         raise_flag = False
         errors = []
         for name, param in self.optimizer_named_parameters:
-            print(f"[debug mcore] update main grads for param: {name}")
+            # print(f"[debug mcore] update main grads for param: {name}")
             orig_param = param.orig_param
             group = self.parameter_groups[self.param_to_param_group[orig_param]]
             gbuf = group.main_grad_buffer
@@ -2514,11 +2514,11 @@ class ParamAndGradBuffer:
                     setattr(param, "decoupled_grad", grad)
                 else:
                     # Attach the gradient to the optimizer parameter.
-                    if hasattr(param, "grad"):
-                        print(f"[debug mcore] before set grad for param: {name}, param.grad.shape={param.grad.shape if param.grad is not None else None}")
-                    if grad is not None:
-                        print(f"[debug mcore] set grad for param: {name}, grad.shape={grad.shape}")
-                        
+                    # if hasattr(param, "grad"):
+                    #     print(f"[debug mcore] before set grad for param: {name}, param.grad.shape={param.grad.shape if param.grad is not None else None}")
+                    # if grad is not None:
+                    #     print(f"[debug mcore] set grad for param: {name}, grad.shape={grad.shape}")
+
                     setattr(param, "grad", grad.to(param.dtype) if grad is not None else None)
             except Exception as e:
                 raise_flag = True
