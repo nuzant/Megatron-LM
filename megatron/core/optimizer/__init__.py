@@ -6,6 +6,7 @@ from dataclasses import astuple
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import torch
+import torch.distributed
 from torch.optim import SGD as CPUSGD
 from torch.optim import AdamW as CPUAdam
 
